@@ -19,4 +19,18 @@ export interface Todo {
   createdAt?: string
   updatedAt?: string
   priority?: "low" | "medium" | "high"
+  order?: number
+}
+
+export type TodoDocument = {
+  _id: import("mongodb").ObjectId
+  userId: string
+  title: string
+  completed: boolean
+  emoji?: string
+  content: ContentBlock[]
+  createdAt: Date
+  updatedAt: Date
+  priority?: "low" | "medium" | "high"
+  order: number
 }

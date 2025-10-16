@@ -1,5 +1,6 @@
 "use client"
 
+import { UserButton } from "@clerk/nextjs"
 import { cn } from "@/lib/utils"
 
 import type React from "react"
@@ -12,14 +13,15 @@ import type { Todo } from "@/types/todo"
 
 interface TodoListProps {
   todos: Todo[]
-  onToggle: (id: string) => void
-  onAdd: (title: string) => void
+  onToggle: (id: string) => Promise<void> | void
+  onAdd: (title: string) => Promise<void> | void
   onSelect: (todo: Todo) => void
-  onDelete: (id: string) => void
-  onReorder: (fromIndex: number, toIndex: number) => void
+  onDelete: (id: string) => Promise<void> | void
+  onReorder: (fromIndex: number, toIndex: number) => Promise<void> | void
+  loading?: boolean
 }
 
-export function TodoList({ todos, onToggle, onAdd, onSelect, onDelete, onReorder }: TodoListProps) {
+export function TodoList({ todos, onToggle, onAdd, onSelect, onDelete, onReorder, loading = false }: TodoListProps) {
   const [showAddInput, setShowAddInput] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
@@ -91,27 +93,31 @@ export function TodoList({ todos, onToggle, onAdd, onSelect, onDelete, onReorder
   }
 
   const motivationalMessage = getMotivationalMessage()
+  const isLoadingEmpty = loading && totalCount === 0
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-neutral-50 px-6 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-4">
           <div>
             <h1 className="text-3xl font-light text-neutral-800 mb-1">{greeting}</h1>
             <p className="text-sm text-neutral-500">Stay focused on what matters</p>
           </div>
-          <div className="text-right">
-            <div className="flex items-center gap-1 text-neutral-400 mb-1">
-              <Calendar size={14} />
-              <span className="text-xs">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <div className="flex items-center gap-1 text-neutral-400 mb-1">
+                <Calendar size={14} />
+                <span className="text-xs">
+                  {new Date().toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
             </div>
+            <UserButton afterSignOutUrl="/login" appearance={{ elements: { userButtonAvatarBox: "w-9 h-9" } }} />
           </div>
         </div>
 
@@ -150,6 +156,14 @@ export function TodoList({ todos, onToggle, onAdd, onSelect, onDelete, onReorder
       </div>
 
       {/* Active Tasks */}
+      {isLoadingEmpty && (
+        <div className="space-y-3 mb-8">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="h-20 animate-pulse rounded-2xl bg-neutral-200/70" />
+          ))}
+        </div>
+      )}
+
       {activeTodos.length > 0 && (
         <div className="mb-8">
           <div className="space-y-3">
@@ -210,7 +224,7 @@ export function TodoList({ todos, onToggle, onAdd, onSelect, onDelete, onReorder
       )}
 
       {/* Empty State */}
-      {totalCount === 0 && (
+      {totalCount === 0 && !loading && (
         <div className="text-center py-16">
           <div className="w-16 h-16 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 size={24} className="text-neutral-400" />
@@ -223,9 +237,13 @@ export function TodoList({ todos, onToggle, onAdd, onSelect, onDelete, onReorder
       {/* Add Todo Input */}
       {showAddInput && (
         <AddTodoInput
-          onAdd={(title) => {
-            onAdd(title)
-            setShowAddInput(false)
+          onAdd={async (title) => {
+            try {
+              await onAdd(title)
+              setShowAddInput(false)
+            } catch (err) {
+              console.error(err)
+            }
           }}
           onCancel={() => setShowAddInput(false)}
         />

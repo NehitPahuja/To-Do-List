@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils"
 interface TodoItemProps {
   todo: Todo
   index: number
-  onToggle: (id: string) => void
+  onToggle: (id: string) => Promise<void> | void
   onSelect: (todo: Todo) => void
-  onDelete: (id: string) => void
+  onDelete: (id: string) => Promise<void> | void
   onDragStart: (e: React.DragEvent, index: number) => void
   onDragOver: (e: React.DragEvent, index: number) => void
   onDragLeave: () => void

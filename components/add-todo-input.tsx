@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react"
 import { Plus, X, Sparkles } from "lucide-react"
 
 interface AddTodoInputProps {
-  onAdd: (title: string) => void
+  onAdd: (title: string) => Promise<void> | void
   onCancel: () => void
 }
 
@@ -16,14 +16,20 @@ export function AddTodoInput({ onAdd, onCancel }: AddTodoInputProps) {
   const [title, setTitle] = useState("")
   const [emoji, setEmoji] = useState("📝")
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (title.trim()) {
-      onAdd(title.trim())
-      setTitle("")
-      setEmoji("📝")
+      try {
+        setIsSubmitting(true)
+        await onAdd(title.trim())
+        setTitle("")
+        setEmoji("📝")
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -143,11 +149,11 @@ export function AddTodoInput({ onAdd, onCancel }: AddTodoInputProps) {
             <div className="flex gap-3 pt-2">
               <button
                 type="submit"
-                disabled={!title.trim()}
+                disabled={!title.trim() || isSubmitting}
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-neutral-800 text-white rounded-xl hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                <Plus size={18} />
-                Add Task
+                <Plus size={18} className={cn(isSubmitting && "animate-spin")} />
+                {isSubmitting ? "Adding..." : "Add Task"}
               </button>
               <button
                 type="button"

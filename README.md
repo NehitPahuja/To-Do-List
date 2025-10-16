@@ -8,16 +8,20 @@
 </p>
 
 <p align="center">
-  A minimal and responsive <b>To-Do List Web App</b> built with HTML, CSS, and JavaScript.<br/>
-  Organize your daily tasks with a simple, distraction-free interface.
+  A minimal and responsive <b>To-Do List Web App</b> built with Next.js, TypeScript, Tailwind CSS, Clerk, and MongoDB.<br/>
+  Organize your daily tasks with a simple, distraction-free interface that syncs everywhere.
 </p>
 
 ## 🚀 Features
-- ➕ Add / ✏️ Edit / 🗑️ Delete tasks  
-- ✅ Mark as complete / undo  
-- 💾 Saves data in LocalStorage  
-- 📱 Responsive and lightweight  
+- 🔐 Clerk-powered authentication with custom `/login` and `/sign-up` pages
+- ➕ Add / ✏️ Edit / 🗑️ Delete tasks backed by MongoDB persistence
+- ✅ Optimistic toggles, drag-to-reorder support, and detailed task notes
+- 📱 Responsive and lightweight UI with progress feedback
 
 ## ⚙️ Tech Stack
-**HTML** • **CSS** • **JavaScript**
+**Next.js** • **React** • **TypeScript** • **Tailwind CSS**
+
+## 📚 Configuration
+
+Create a `.env.local` from `.env.example` and provide your Clerk and MongoDB credentials before running the app. See [`docs/adding-backend-with-mongodb.md`](docs/adding-backend-with-mongodb.md) for a complete breakdown of the backend and authentication stack.
 

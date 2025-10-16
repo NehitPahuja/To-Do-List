@@ -8,7 +8,7 @@ import { ContentBlockComponent } from "./content-block"
 interface TodoDetailProps {
   todo: Todo
   onBack: () => void
-  onUpdate: (todo: Todo) => void
+  onUpdate: (todo: Todo) => Promise<void> | void
 }
 
 export function TodoDetail({ todo, onBack, onUpdate }: TodoDetailProps) {
